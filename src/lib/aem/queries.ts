@@ -14,12 +14,13 @@ import type { HomepageContent, HomepageQueryResult } from "./types";
  * from the linked ContentSection CF model.
  */
 const HOMEPAGE_QUERY = /* GraphQL */ `
-  query GetHomepage($path: String!) {
-    homepageContentByPath(_path: $path) {
-      item {
-        heroTitle
-        heroSubtitle
-        heroImage {
+  query GetAllHomepages {
+    homepagecontentList {
+      items {
+        _path
+        herotitle
+        herosubtitle
+        heroimage {
           ... on ImageRef {
             _path
             description
@@ -28,7 +29,7 @@ const HOMEPAGE_QUERY = /* GraphQL */ `
           }
         }
         sections {
-          ... on ContentSectionModel {
+          ... on ContentsectionModel {
             title
             body {
               html
@@ -39,7 +40,6 @@ const HOMEPAGE_QUERY = /* GraphQL */ `
                 _path
                 description
                 width
-                height
               }
             }
           }
@@ -56,10 +56,11 @@ const HOMEPAGE_QUERY = /* GraphQL */ `
  * Lets the page render correctly in local dev without needing live AEM access.
  */
 export const MOCK_HOMEPAGE: HomepageContent = {
-  heroTitle: "Welcome — AEM + Next.js POC",
-  heroSubtitle:
+  _path: "/content/dam/global/en/home-mock",
+  herotitle: "Welcome — AEM + Next.js POC",
+  herosubtitle:
     "This content is served from mock data. Configure your .env.local to load real content from AEM as a Cloud Service.",
-  heroImage: null,
+  heroimage: null,
   sections: [
     {
       title: "Server Components + AEM Headless",
@@ -105,14 +106,10 @@ export async function getHomepage(): Promise<HomepageContent> {
     return MOCK_HOMEPAGE;
   }
 
-  const path =
-    process.env.AEM_HOMEPAGE_CF_PATH ?? "/content/dam/my-site/en/homepage";
-
   try {
     const client = getAEMClient();
     const response = await client.runQuery({
       query: HOMEPAGE_QUERY,
-      variables: { path },
     });
 
     // AEM returns GraphQL errors in response.errors even on HTTP 200.
@@ -125,17 +122,18 @@ export async function getHomepage(): Promise<HomepageContent> {
     }
 
     const data = response.data as HomepageQueryResult;
-    const item = data?.homepageContentByPath?.item;
+    const items = data?.homepagecontentList?.items;
 
-    if (!item) {
+    if (!items || items.length === 0) {
       console.error(
-        `[AEM] No HomepageContent fragment found at path: ${path}. ` +
-          "Check AEM_HOMEPAGE_CF_PATH and that the CF model is named 'HomepageContent'."
+        `[AEM] No HomepageContent fragments found. ` +
+          "Check that CF model 'HomepageContent' has content created."
       );
       return MOCK_HOMEPAGE;
     }
 
-    return item;
+    // Return the first item from the list
+    return items[0];
   } catch (err) {
     console.error("[AEM] Failed to fetch homepage content:", err);
     return MOCK_HOMEPAGE;

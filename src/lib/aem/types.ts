@@ -40,9 +40,10 @@ export interface ContentSection {
  * Contains hero fields and an array of inline ContentSection fragments.
  */
 export interface HomepageContent {
-  heroTitle: string;
-  heroSubtitle: string;
-  heroImage?: AEMImageReference | null;
+  _path: string;
+  herotitle: string;
+  herosubtitle: string;
+  heroimage?: AEMImageReference | null;
   sections: ContentSection[];
 }
 
@@ -51,7 +52,7 @@ export interface HomepageContent {
  * The outer key matches the GraphQL query field name.
  */
 export interface HomepageQueryResult {
-  homepageContentByPath: {
-    item: HomepageContent;
+  homepagecontentList: {
+    items: HomepageContent[];
   };
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import AEMHeadless from "@adobe/aem-headless-client-js";
 
 /**
@@ -9,7 +10,7 @@ function requireEnv(name: string): string {
   if (!value) {
     throw new Error(
       `Missing required environment variable: ${name}. ` +
-        `Copy .env.local.example to .env.local and fill in all values.`
+        `Copy .env.local.example to .env.local and fill in all values.`,
     );
   }
   return value;
@@ -22,8 +23,8 @@ function requireEnv(name: string): string {
 export function isAEMConfigured(): boolean {
   return Boolean(
     process.env.AEM_HOST &&
-      process.env.AEM_GRAPHQL_ENDPOINT &&
-      process.env.AEM_TOKEN
+    process.env.AEM_GRAPHQL_ENDPOINT &&
+    process.env.AEM_TOKEN,
   );
 }
 
@@ -40,8 +41,9 @@ export function getAEMClient(): AEMHeadless {
   _client = new AEMHeadless({
     serviceURL: requireEnv("AEM_HOST"),
     endpoint: requireEnv("AEM_GRAPHQL_ENDPOINT"),
-    // Bearer token — the client prepends "Bearer " automatically.
     auth: requireEnv("AEM_TOKEN"),
+    // @ts-ignore
+    fetch,
   });
 
   return _client;

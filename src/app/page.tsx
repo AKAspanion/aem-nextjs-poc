@@ -37,9 +37,9 @@ export default async function Home() {
 
       {/* Hero section driven by AEM HomepageContent CF */}
       <Hero
-        title={content.heroTitle}
-        subtitle={content.heroSubtitle}
-        image={content.heroImage}
+        title={content.herotitle}
+        subtitle={content.herosubtitle}
+        image={content.heroimage}
       />
 
       {/* Divider */}
